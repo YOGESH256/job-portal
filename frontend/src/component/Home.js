@@ -65,7 +65,7 @@ const JobTile = (props) => {
   };
 
   const handleApply = () => {
-    console.log(job._id);
+    console.log("job",job._id);
     console.log(sop);
     axios
       .post(

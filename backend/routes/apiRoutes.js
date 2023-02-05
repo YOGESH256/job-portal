@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const jwtAuth = require("../lib/jwtAuth");
-
+const request=require('request-promise');
 const User = require("../db/User");
 const JobApplicant = require("../db/JobApplicant");
 const Recruiter = require("../db/Recruiter");
@@ -49,9 +49,9 @@ router.post("/jobs", jwtAuth, (req, res) => {
 });
 
 // to get all the jobs [pagination] [for recruiter personal and for everyone]
-router.get("/jobs", jwtAuth, (req, res) => {
+router.get("/jobs", jwtAuth, async (req, res) => {
   let user = req.user;
-
+  console.log("user",user)
   let findParams = {};
   let sortParams = {};
 
@@ -66,7 +66,76 @@ router.get("/jobs", jwtAuth, (req, res) => {
       userId: user._id,
     };
   }
+  if (user.type === "applicant"){
+    const data = {
+      id : user._id
+  }
 
+  var options = {
+      method: 'POST',
+
+      // http:flaskserverurl:port/route
+      uri: 'http://127.0.0.1:5000/recommend',
+      body: data,
+
+      // Automatically stringifies
+      // the body to JSON 
+      json: true
+  };
+  var sendrequest = request(options)
+
+      // The parsedBody contains the data
+      // sent back from the Flask server 
+      .then((parsedBody)=> {
+            
+          // You can do something with
+          // returned data
+          return parsedBody['result'];
+
+          //result1.push(result)
+          // if(Array.isArray(result)){
+          //   res=result
+          // }
+          // else{
+          //   res=[result]
+          // }
+          // findParams = {
+          //   ...findParams,
+          //   title: {
+          //     $in : result ,
+          //   },
+          // };
+          
+          
+      })
+      .catch((err)=> {
+          console.log(err);
+      });
+      //console.log("bvsysh",sendrequest)
+      //  let recommend=async()=>{
+      //    const res=await sendrequest;
+      //    console.log(res);
+      //    return res;
+      //  }
+      // let recommend = () => {
+      //   sendrequest.then((res)=>{
+      //     console.log("Hii",res)
+      //     return res;
+      //   });
+      // }
+      // setTimeout(() => {
+        
+      // }, 5);
+      let result1=await sendrequest;
+        console.log("Hii",result1);
+         findParams = {
+               ...findParams,
+               title: {
+                 $in : result1 ,
+               },
+            };
+
+  }
   if (req.query.q) {
     findParams = {
       ...findParams,
@@ -165,7 +234,7 @@ router.get("/jobs", jwtAuth, (req, res) => {
     }
   }
 
-  console.log(findParams);
+  console.log("FIND",findParams);
   console.log(sortParams);
 
   // Job.find(findParams).collation({ locale: "en" }).sort(sortParams);
