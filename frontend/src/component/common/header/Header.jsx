@@ -34,6 +34,12 @@ const Header = () => {
     history.push(location);
   };
 
+  const handleClick2 = (location) => {
+    window.location.assign("http://localhost:3002/register");
+    
+   
+  }
+
   return (
     <>
       <Head />
@@ -91,6 +97,12 @@ const Header = () => {
               </Button>
               <Button color="inherit" onClick={() => handleClick("/signup")}>
                 Signup
+                  </Button>
+                  <Button color="inherit" onClick={() => handleClick2("http://localhost:3002/")}>
+                Trainer Login
+              </Button>
+              <Button color="inherit" onClick={() => handleClick2("http://localhost:3002/")}>
+                Trainer Login
               </Button>
               {/* <Button color="inherit" onClick={() => handleClick("/signup")}>
                 Signup
