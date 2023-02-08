@@ -52,8 +52,13 @@ let schema = new mongoose.Schema(
         msg: "Statement of purpose should not be greater than 250 words",
       },
     },
+    rank : {
+      type: mongoose.Schema.Types.Decimal128,
+      default: 0,
+    }
   },
   { collation: { locale: "en" } }
+
 );
 
 // schema.virtual("applicationUser", {

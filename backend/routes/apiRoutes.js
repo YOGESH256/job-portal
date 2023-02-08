@@ -14,7 +14,6 @@ const router = express.Router();
 // To add new job
 router.post("/jobs", jwtAuth, (req, res) => {
   const user = req.user;
-
   if (user.type != "recruiter") {
     res.status(401).json({
       message: "You don't have permissions to add jobs",
@@ -23,7 +22,13 @@ router.post("/jobs", jwtAuth, (req, res) => {
   }
 
   const data = req.body;
-
+  const skill=data.skillsets;
+  
+  for (var index = 0; index < skill.length; index++)
+    {
+        skill[index]=skill[index].charAt(0).toUpperCase() + skill[index].slice(1)
+    }
+    console.log("AGHJ",skill);
   let job = new Job({
     userId: user._id,
     title: data.title,
@@ -31,7 +36,7 @@ router.post("/jobs", jwtAuth, (req, res) => {
     maxPositions: data.maxPositions,
     dateOfPosting: data.dateOfPosting,
     deadline: data.deadline,
-    skillsets: data.skillsets,
+    skillsets: skill,
     jobType: data.jobType,
     duration: data.duration,
     salary: data.salary,
@@ -600,14 +605,30 @@ router.post("/jobs/:id/applications", jwtAuth, (req, res) => {
                       Application.countDocuments({
                         userId: user._id,
                         status: "accepted",
-                      }).then((acceptedJobs) => {
+                      }).then(async (acceptedJobs) => {
                         if (acceptedJobs === 0) {
+                          JobApplicant.findOne({userId : user._id})
+                          .then(async (jobApplicant)=>{
+
+                          
+                          const arr1=await jobApplicant.skills;
+                          
+                          const arr2=job.skillsets;
+                          console.log("WERR:",arr1,arr2);
+                          const output = arr2.filter(function (obj) {
+                          return arr1.indexOf(obj) !== -1;
+                          });
+                          const match1 = output.length;
+                          const total=arr1 + arr2;
+                          const outp=match1/arr2.length;
+                          
                           const application = new Application({
                             userId: user._id,
                             recruiterId: job.userId,
                             jobId: job._id,
                             status: "applied",
                             sop: data.sop,
+                            rank: outp
                           });
                           application
                             .save()
@@ -619,6 +640,10 @@ router.post("/jobs/:id/applications", jwtAuth, (req, res) => {
                             .catch((err) => {
                               res.status(400).json(err);
                             });
+                          })
+                          .catch((err) => {
+                            res.status(400).json(err);
+                          });
                         } else {
                           res.status(400).json({
                             message:
@@ -632,10 +657,13 @@ router.post("/jobs/:id/applications", jwtAuth, (req, res) => {
                           "You have 10 active applications. Hence you cannot apply.",
                       });
                     }
+                    
                   })
                   .catch((err) => {
                     res.status(400).json(err);
                   });
+                
+                
               } else {
                 res.status(400).json({
                   message: "Application limit reached",
@@ -675,7 +703,9 @@ router.get("/jobs/:id/applications", jwtAuth, (req, res) => {
     recruiterId: user._id,
   };
 
-  let sortParams = {};
+  let sortParams={
+    rank:-1
+  }
 
   if (req.query.status) {
     findParams = {
@@ -685,12 +715,13 @@ router.get("/jobs/:id/applications", jwtAuth, (req, res) => {
   }
 
   Application.find(findParams)
-    .collation({ locale: "en" })
     .sort(sortParams)
+    .collation({ locale: "en" })
     // .skip(skip)
     // .limit(limit)
     .then((applications) => {
       res.json(applications);
+      
     })
     .catch((err) => {
       res.status(400).json(err);

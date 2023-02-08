@@ -92,6 +92,9 @@ const Header = () => {
               <Button color="inherit" onClick={() => handleClick("/signup")}>
                 Signup
               </Button>
+              {/* <Button color="inherit" onClick={() => handleClick("/signup")}>
+                Signup
+              </Button> */}
             </>
           )}
           </ul>
