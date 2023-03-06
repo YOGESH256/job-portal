@@ -127,6 +127,7 @@ const Login = (props) => {
     name: "",
     education: [],
     skills: [],
+    interests:[],
     resume: "",
     profile: "",
     bio: "",
@@ -405,6 +406,17 @@ const Login = (props) => {
                 helperText="Press enter to add skills"
                 onChange={(chips) =>
                   setSignupDetails({ ...signupDetails, skills: chips })
+                }
+              />
+              </Grid>
+              <Grid item>
+              <ChipInput
+                className={classes.inputBox}
+                label="Interested Skills"
+                variant="outlined"
+                helperText="Press enter to add skills"
+                onChange={(chips) =>
+                  setSignupDetails({ ...signupDetails, interests: chips })
                 }
               />
             </Grid>

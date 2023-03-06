@@ -25,9 +25,10 @@ import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 
 import { SetPopupContext } from "../../App";
-
+import emailjs from 'emailjs-com';
 import apiList, { server } from "../../lib/apiList";
-
+const nodemailer = require('nodemailer');
+ 
 const useStyles = makeStyles((theme) => ({
   body: {
     height: "inherit",
@@ -61,6 +62,9 @@ const useStyles = makeStyles((theme) => ({
 const FilterPopup = (props) => {
   const classes = useStyles();
   const { open, handleClose, searchOptions, setSearchOptions, getData } = props;
+   const handleShort=()=>{
+    console.log('Hiashxjxn')
+  }
   return (
     <Modal open={open} onClose={handleClose} className={classes.popupDialog}>
       <Paper
@@ -136,7 +140,7 @@ const FilterPopup = (props) => {
                             [event.target.name]: event.target.checked,
                           },
                         });
-                      }}
+                       }}
                     />
                   }
                   label="Shortlisted"
@@ -410,7 +414,18 @@ const ApplicationTile = (props) => {
           severity: "success",
           message: response.data.message,
         });
-        getData();
+        if(status=="shortlisted"){
+          emailjs.init('j0BTEvQn7MMPiVNHa');
+          console.log(response.data.email);
+        var cont={
+          to_email: response.data.email,
+          company_1: response.data.company_1,
+          role_1: response.data.role_1
+        };
+        emailjs.send('service_n8ldc3h', 'template_wh1yvsi', cont ).then(function(res){});
+        console.log("send");
+        }
+  getData();
       })
       .catch((err) => {
         setPopup({

@@ -80,22 +80,27 @@ const JobTile = (props) => {
         }
       )
       .then((response) => {
-        setPopup({
-          open: true,
-          severity: "success",
-          message: response.data.message,
+        
+        if(response.data.message==="Redirecting"){
+          window.location.replace(response.data.link);
+        }
+        
+          setPopup({
+            open: true,
+            severity: "success",
+            message: response.data.message,
+          });
+          handleClose();
+        })
+        .catch((err) => {
+          console.log(err.response);
+          setPopup({
+            open: true,
+            severity: "error",
+            message: err.response.data.message,
+          });
+          handleClose();
         });
-        handleClose();
-      })
-      .catch((err) => {
-        console.log(err.response);
-        setPopup({
-          open: true,
-          severity: "error",
-          message: err.response.data.message,
-        });
-        handleClose();
-      });
   };
 
   const deadline = new Date(job.deadline).toLocaleDateString();
@@ -116,7 +121,7 @@ const JobTile = (props) => {
             Duration :{" "}
             {job.duration !== 0 ? `${job.duration} month` : `Flexible`}
           </Grid>
-          <Grid item>Posted By : {job.recruiter.name}</Grid>
+          <Grid item>Posted By : {job.Recruiter}</Grid>
           <Grid item>Application Deadline : {deadline}</Grid>
 
           <Grid item>

@@ -113,6 +113,7 @@ const Profile = (props) => {
     name: "",
     education: [],
     skills: [],
+    interests:[],
     resume: "",
     profile: "",
   });
@@ -271,6 +272,31 @@ const Profile = (props) => {
                     setProfileDetails({
                       ...profileDetails,
                       skills: skills,
+                    });
+                  }}
+                  fullWidth
+                />
+              </Grid>
+              <br></br>
+              <Grid item>
+                <ChipInput
+                  className={classes.inputBox}
+                  label="Interested Skills"
+                  variant="outlined"
+                  helperText="Press enter to add skills"
+                  value={profileDetails.interests}
+                  onAdd={(chip) =>
+                    setProfileDetails({
+                      ...profileDetails,
+                      skills: [...profileDetails.interests, chip],
+                    })
+                  }
+                  onDelete={(chip, index) => {
+                    let interests = profileDetails.interests;
+                    interests.splice(index, 1);
+                    setProfileDetails({
+                      ...profileDetails,
+                      interests: interests,
                     });
                   }}
                   fullWidth

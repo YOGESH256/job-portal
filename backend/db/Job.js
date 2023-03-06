@@ -128,6 +128,13 @@ let schema = new mongoose.Schema(
         msg: "Invalid rating",
       },
     },
+    link: {
+      type: String,
+      default: "Undefined",
+    },
+    Recruiter: {
+      type: String,
+    },
   },
   { collation: { locale: "en" } }
 );

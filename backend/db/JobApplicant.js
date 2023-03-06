@@ -39,6 +39,7 @@ let schema = new mongoose.Schema(
       },
     ],
     skills: [String],
+    interests: [String],
     rating: {
       type: Number,
       max: 5.0,

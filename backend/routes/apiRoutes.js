@@ -28,29 +28,33 @@ router.post("/jobs", jwtAuth, (req, res) => {
     {
         skill[index]=skill[index].charAt(0).toUpperCase() + skill[index].slice(1)
     }
-    console.log("AGHJ",skill);
-  let job = new Job({
-    userId: user._id,
-    title: data.title,
-    maxApplicants: data.maxApplicants,
-    maxPositions: data.maxPositions,
-    dateOfPosting: data.dateOfPosting,
-    deadline: data.deadline,
-    skillsets: skill,
-    jobType: data.jobType,
-    duration: data.duration,
-    salary: data.salary,
-    rating: data.rating,
-  });
-
-  job
-    .save()
-    .then(() => {
-      res.json({ message: "Job added successfully to the database" });
-    })
-    .catch((err) => {
-      res.status(400).json(err);
+  
+  Recruiter.findOne({userId:user._id}).then((rec)=>{
+    name1=rec.name;
+    let job = new Job({
+      userId: user._id,
+      title: data.title,
+      maxApplicants: data.maxApplicants,
+      maxPositions: data.maxPositions,
+      dateOfPosting: data.dateOfPosting,
+      deadline: data.deadline,
+      skillsets: skill,
+      jobType: data.jobType,
+      duration: data.duration,
+      salary: data.salary,
+      rating: data.rating,
+      Recruiter: name1,
     });
+  
+    job
+      .save()
+      .then(() => {
+        res.json({ message: "Job added successfully to the database" });
+      })
+      .catch((err) => {
+        res.status(400).json(err);
+      });
+  })
 });
 
 // to get all the jobs [pagination] [for recruiter personal and for everyone]
@@ -247,15 +251,7 @@ router.get("/jobs", jwtAuth, async (req, res) => {
   // .limit(limit)
 
   let arr = [
-    {
-      $lookup: {
-        from: "recruiterinfos",
-        localField: "userId",
-        foreignField: "userId",
-        as: "recruiter",
-      },
-    },
-    { $unwind: "$recruiter" },
+    
     { $match: findParams },
   ];
 
@@ -287,6 +283,7 @@ router.get("/jobs", jwtAuth, async (req, res) => {
         });
         return;
       }
+      console.log(posts);
       res.json(posts);
     })
     .catch((err) => {
@@ -520,6 +517,9 @@ router.put("/user", jwtAuth, (req, res) => {
         if (data.skills) {
           jobApplicant.skills = data.skills;
         }
+        if (data.interests) {
+          jobApplicant.interests = data.interests;
+        }
         if (data.resume) {
           jobApplicant.resume = data.resume;
         }
@@ -555,13 +555,21 @@ router.post("/jobs/:id/applications", jwtAuth, (req, res) => {
   }
   const data = req.body;
   const jobId = req.params.id;
-
-  // check whether applied previously
-  // find job
-  // check count of active applications < limit
-  // check user had < 10 active applications && check if user is not having any accepted jobs (user id)
-  // store the data in applications
-
+  Job.findOne({ _id: jobId })
+  .then((job) => {
+    if (job === null) {
+      res.status(404).json({
+        message: "Job does not exist",
+      });
+      return;
+    }
+  if(job.link!=="Undefined"){
+    res.json({
+      message:"Redirecting",
+      link:job.link,
+    });
+    return;
+  }
   Application.findOne({
     userId: user._id,
     jobId: jobId,
@@ -681,6 +689,14 @@ router.post("/jobs/:id/applications", jwtAuth, (req, res) => {
     .catch((err) => {
       res.json(400).json(err);
     });
+  });
+  // check whether applied previously
+  // find job
+  // check count of active applications < limit
+  // check user had < 10 active applications && check if user is not having any accepted jobs (user id)
+  // store the data in applications
+
+
 });
 
 // recruiter gets applications for a particular job [pagination] [todo: test: done]
@@ -784,7 +800,7 @@ router.get("/applications", jwtAuth, (req, res) => {
 });
 
 // update status of application: [Applicant: Can cancel, Recruiter: Can do everything] [todo: test: done]
-router.put("/applications/:id", jwtAuth, (req, res) => {
+router.put("/applications/:id", jwtAuth, async(req, res) => {
   const user = req.user;
   const id = req.params.id;
   const status = req.body.status;
@@ -862,7 +878,7 @@ router.put("/applications/:id", jwtAuth, (req, res) => {
                       },
                       { multi: true }
                     )
-                      .then(() => {
+                      .then(async() => {
                         if (status === "accepted") {
                           Job.findOneAndUpdate(
                             {
@@ -876,6 +892,8 @@ router.put("/applications/:id", jwtAuth, (req, res) => {
                             }
                           )
                             .then(() => {
+                             
+ 
                               res.json({
                                 message: `Application ${status} successfully`,
                               });
@@ -883,7 +901,8 @@ router.put("/applications/:id", jwtAuth, (req, res) => {
                             .catch((err) => {
                               res.status(400).json(err);
                             });
-                        } else {
+                        }
+                        else {
                           res.json({
                             message: `Application ${status} successfully`,
                           });
@@ -907,7 +926,54 @@ router.put("/applications/:id", jwtAuth, (req, res) => {
         .catch((err) => {
           res.status(400).json(err);
         });
-    } else {
+    } 
+    else if(status === "shortlisted"){
+      Application.findOneAndUpdate(
+        {
+          _id: id,
+          recruiterId: user._id,
+          status: {
+            $nin: ["rejected", "deleted", "cancelled"],
+          },
+        },
+        {
+          $set: {
+            status: status,
+          },
+        }
+      )
+        .then((application) => {
+          if (application === null) {
+            res.status(400).json({
+              message: "Application status cannot be updated",
+            });
+            return;
+          }
+          else {
+            console.log("Hii");
+            User.findOne({_id : application.userId})
+            .then((user1)=>{
+            console.log("Hello",user1.email);
+              Job.findOne({_id:application.jobId})
+              .then((rec1)=>{
+                res.json({
+                  message: `Application ${status} successfully`,
+                  email:user1.email,
+                  company_1:rec1.Recruiter,
+                  role_1:rec1.title
+                });
+                return;
+              })
+        //return us.email;
+            });
+            
+          }
+        })
+        .catch((err) => {
+          res.status(400).json(err);
+        });
+    }
+    else {
       Application.findOneAndUpdate(
         {
           _id: id,
