@@ -245,7 +245,6 @@ router.get("/jobs", jwtAuth, async (req, res) => {
 
   console.log("FIND",findParams);
   console.log(sortParams);
-
   // Job.find(findParams).collation({ locale: "en" }).sort(sortParams);
   // .skip(skip)
   // .limit(limit)
@@ -254,7 +253,6 @@ router.get("/jobs", jwtAuth, async (req, res) => {
     
     { $match: findParams },
   ];
-
   if (Object.keys(sortParams).length > 0) {
     arr = [
       {
@@ -270,6 +268,7 @@ router.get("/jobs", jwtAuth, async (req, res) => {
       {
         $sort: sortParams,
       },
+      
     ];
   }
 
@@ -283,7 +282,7 @@ router.get("/jobs", jwtAuth, async (req, res) => {
         });
         return;
       }
-      console.log(posts);
+      console.log("Yeah!! ",posts[8]);
       res.json(posts);
     })
     .catch((err) => {
