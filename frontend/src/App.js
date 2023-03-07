@@ -1,12 +1,12 @@
-import "./App.css"
+import "./App.css";
 import { createContext, useState } from "react";
 
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import { Grid, makeStyles } from "@material-ui/core";
-import Footer from "./component/common/footer/Footer"
-import LHome from "./component/home/Home"
+import Footer from "./component/common/footer/Footer";
+import LHome from "./component/home/Home";
 import CourseHome from "./component/allcourses/CourseHome";
-import Header from "./component/common/header/Header"
+import Header from "./component/common/header/Header";
 
 import Welcome, { ErrorPage } from "./component/Welcome";
 import Navbar from "./component/Navbar";
@@ -18,6 +18,7 @@ import Applications from "./component/Applications";
 import Profile from "./component/Profile";
 import CreateJobs from "./component/recruiter/CreateJobs";
 import MyJobs from "./component/recruiter/MyJobs";
+import UploadVideo from "./component/UploadVideo";
 import JobApplications from "./component/recruiter/JobApplications";
 import AcceptedApplicants from "./component/recruiter/AcceptedApplicants";
 import RecruiterProfile from "./component/recruiter/Profile";
@@ -55,13 +56,12 @@ function App() {
             <Header />
           </Grid>
           <Grid item className={classes.body}>
-
             <Switch>
               {/*<Route exact path="/">
                 <Welcome />
               </Route>*/}
-              <Route exact path='/' component={LHome} />
-              <Route exact path='/allcourse' component={CourseHome} />
+              <Route exact path="/" component={LHome} />
+              <Route exact path="/allcourse" component={CourseHome} />
               <Route exact path="/login">
                 <Login />
               </Route>
@@ -96,6 +96,9 @@ function App() {
               </Route>
               <Route exact path="/employees">
                 <AcceptedApplicants />
+              </Route>
+              <Route exact path="/upload">
+                <UploadVideo />
               </Route>
               <Route>
                 <ErrorPage />
