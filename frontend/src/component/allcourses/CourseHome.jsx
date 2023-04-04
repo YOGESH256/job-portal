@@ -7,6 +7,7 @@ const CourseHome = () => {
   return (
     <>
       <Back title='Explore Courses' />
+      <h1>Recommended Courses</h1>
       <CoursesCard />
       <OnlineCourses />
     </>

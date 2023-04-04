@@ -29,7 +29,7 @@ const CoursesCard = () => {
               <div className="content flex">
                 <div className="left">
                   <div className="img">
-                    <img src={""} alt="" />
+                    <img src={'../images/courses/c1.png'} alt="" ></img>
                   </div>
                 </div>
                 <div className="text">
@@ -61,7 +61,7 @@ const CoursesCard = () => {
               </div>
               <div className="price">
                 <h3>
-                  {val.priceAll} / {val.pricePer}
+                  Free
                 </h3>
               </div>
               <button
