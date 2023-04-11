@@ -28,16 +28,29 @@ const UploadVideo = () => {
     console.log(options);
   }
 
-  const [video, setVideo] = React.useState("fruit");
+  const [video, setVideo] = React.useState([]);
+  const [playListName, setPlayListName] = useState("");
+  const [skill, setSkills] = useState("");
+  
 
   const handleChange = (event) => {
     // console.log(event);
-    setVideo(event.value);
+    let ids = options.filter((a) => a.label === event.value);
+    setVideo([...video , ids[0]?.id]);
     console.log(event.value);
   };
 
-  const onSubmit = (e) => {
-    console.log(video);
+  const onSubmit = async(e) => {
+    e.preventDefault();
+    console.log(video, playListName, skill, "dlsKJ");
+    let skills = skill.split(",")
+    
+    const resp = await axios.post('http://localhost:3002/createPlayList', { videos: video, playListName, skills });
+    setVideo([]);
+    
+    
+   
+
   };
 
   return (
@@ -58,8 +71,20 @@ const UploadVideo = () => {
                 className="form-control"
                 id="name"
                 name="name"
-                // value={name}
-                // onChange={onChange}
+                value={skill}
+                onChange={(e) => setSkills(e.target.value) }
+                placeholder="Enter PlayList Name"
+                required
+              />
+            </div>
+            <div className="form-group">
+            <input
+                type="text"
+                className="form-control"
+                id="name"
+                name="name"
+                value={playListName}
+                onChange={(e) => setPlayListName(e.target.value) }
                 placeholder="Enter PlayList Name"
                 required
               />
@@ -72,6 +97,7 @@ const UploadVideo = () => {
               />
               ;
             </div>
+            <button type = "submit">  Submit </button>
           </form>
         </section>
       </div>
