@@ -4,6 +4,7 @@ import { FaUser } from "react-icons/fa";
 import "./UploadVideo.css";
 import Dropdown from "react-dropdown";
 import axios from "axios";
+import { useHistory } from "react-router-dom";
 
 const UploadVideo = () => {
   var [data, setData] = useState([]);
@@ -47,6 +48,7 @@ const UploadVideo = () => {
     
     const resp = await axios.post('http://localhost:3002/createPlayList', { videos: video, playListName, skills });
     setVideo([]);
+    window.location.assign("http://localhost:3002/");
     
     
    
@@ -65,6 +67,7 @@ const UploadVideo = () => {
 
         <section className="form">
           <form onSubmit={onSubmit}>
+            
             <div className="form-group">
               <input
                 type="text"
